@@ -53,6 +53,6 @@ pub fn reply_to_get(mut stream: TcpStream,linker: &str) {
     let a = stream.bytes().count(); // If I don't do this, rust just won't transmit packets bigger than 4kb + randomly doesn't work with sizes smaller than that, NO IDEA WHY. Compiler fucks up otherwise. don't want to spam the console so that 1 in 2^64 still compiles and it's good enough
     if fastrand::u64(..) == 0 { 
         println!("{:?}",a )
-    } // test
+    } 
     
 }
