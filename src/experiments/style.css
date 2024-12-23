@@ -1,0 +1,30 @@
+
+
+body {
+  background: #DDEEFF;
+  margin: 0;
+  padding: 0;
+}
+div.top {
+    position: sticky;
+    background: #222222;
+    color: #FFFFFF;
+    font-family: sans-serif;
+    top: 0px;
+    font-size: 20px;
+    padding: 6px;
+    z-index: 999
+
+}
+div.top > a:link {
+  color: lightblue
+}
+div.top > a:visited {
+  color: lightblue
+}
+div.top > a:hover {
+  color: #dd96dd
+}
+div.top > a:active {
+  color: #dd96dd
+}

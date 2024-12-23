@@ -1,0 +1,302 @@
+<html lang="en" class=" wizmage-show-html"><head>
+  <title> Restrictions: Web Experiments</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="/favicon.png"/>
+  <style> 
+  :root {
+    --alertsize: calc(5vh + 12px);
+  }
+  
+  
+    body {
+      
+      overflow: hidden
+    }
+    div {
+      font-family: sans-serif;
+    }
+    
+    .box {
+      border-style: solid;
+      margin-top: 1vh;
+      margin-left: 4vw;
+      margin-right: 4vw;
+      margin-bottom: 10vh;
+      padding: 0px;
+      height: calc(97vh - 35px);
+      top: 25px;
+      display: flex;
+      flex-direction: column
+    }
+    
+    .top {
+      position: sticky;
+      background: #222222;
+      color: #FFFFFF;
+      font-family: sans-serif;
+      top: 0px;
+      font-size: 20px;
+      padding: 6px;
+      z-index: 999
+
+    }
+    .messagebox {
+      Overflow-y:scroll;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column-reverse;
+      flex-shrink: 1;
+      align-items: start;
+    }.alert {
+    
+      width: 100%;
+      background: #DDDDDD;
+      border-bottom-style: dashed;
+      border-width: 2px;
+      overflow-x: auto;
+    }
+    
+    .alert_time_left {
+      position:absolute ;
+      opacity: 100%;
+      width: 55%; 
+      height: 100%;
+      background: #AEAEAE;
+    }
+
+    .bottomtext {
+   
+      font-size: calc(var(--alertsize)/2.8);
+      text-align: center;
+      position: relative;
+      z-index: 5;
+    }
+
+    .toptext {
+
+      font-size: calc(var(--alertsize)/2);
+      text-align: center;
+      position: relative;
+    }
+    input[type=text] {
+       color: #000000;
+       height: calc(3vh + 8px);
+       font-size: calc( (3vh + 8px) / 1.25);
+       width: calc(100%);
+       border: none;
+       border-top: solid;
+       outline: none;
+    }
+    
+    span.message {
+
+      padding-left: 0.4%;
+      padding-top: 0.2%;
+      padding-bottom: 0.2%;
+      padding-right: 0.5%;
+      font-size: 180%;
+      border-style: solid;
+      border-color: #55555533;
+      color: #111111;
+      background: #FFFFF688;
+      fill-opacity: 0%;
+      font-family: sans-serif;
+      white-space: normal;
+      word-wrap: break-word;
+     }
+
+     
+     .system_message {
+        
+        padding-left: 0.3%;
+        padding-top: 0.15%;
+        padding-bottom: 0.15%;
+        padding-right: 0.3%;
+        font-family: "Courier";
+        font-weight: 700;
+        font-size: 150%;
+        background: #EEEEEE;
+         color: #000000;
+     }.extra_message_info {
+        color: #888888;
+        font-size: 50%;
+     }
+  </style>
+
+</head>
+<body class="body" > 
+  
+  <div class="top">
+    <a href="../">Web Experiments</a>: Restrictions
+  </div>
+  
+  <div class="box">
+     <div class="topler" id="topler"></div>
+     <div id="Messages" class="messagebox"></div>
+     <input type="text" id="MessageInput" class="messageinput" maxlength="300" placeholder="enter text here for message">
+    
+  </div>
+  <script> 
+      let socket;
+      let MAX_MESSAGES = 25000;
+      let restrictions = []; // {{"Title","Description",StartTime,EndTime}}
+      
+      window.onload = (event) => {
+        connect_to_websockets()
+       /* remake_restrictions()*/
+        setInterval(cooldown_on_restrictions, 20)
+      };
+
+      async function connect_to_websockets() {
+        socket = new WebSocket(window.location.href);
+        socket.onmessage = async function(event) {
+          json = JSON.parse(event.data);
+
+          console.log(json);
+
+          type = json[0];
+          json = json.slice(1)
+          if (type == "Messages") {
+            for(let i = 0; i < json.length; i++) {
+              let msg = json[i];
+              add_message(msg)
+            }
+          } else if (type == "Rules") {
+            restrictions = json;
+            remake_restrictions();
+          }
+        }
+      }
+      
+      document.getElementById('MessageInput').addEventListener('keydown', function(e){
+          if(e.keyCode === 13) {
+            send_message()
+          };
+      });
+      
+      function cooldown_on_restrictions() {
+        children = document.getElementById("topler").children;
+        document.getElementById("Messages").scrollTop = Math.min(0,document.getElementById("Messages").scrollTop)
+        time = new Date()
+        for (var i = 0; i < children.length; i++) {
+          array = restrictions[i]
+          
+          slice = (time - array[2]) / (array[3] - array[2])
+          slice = Math.min(Math.max(slice,0),1)
+          
+     
+          document.getElementById("alert_timer_" + i).style.width = (document.getElementById("alert_" + i).offsetWidth * slice) + "px"
+          document.getElementById("alert_timer_" + i).style.height = (document.getElementById("alert_" + i).offsetHeight - 2  ) + "px"
+        }
+      }
+
+      function send_message() {
+          string = document.getElementById('MessageInput').value;
+          document.getElementById('MessageInput').value = "";
+          if (string != "") {
+            socket.send(string)
+          }
+      }
+
+      function add_message(msg) {
+         text_area = document.getElementById("Messages")
+      
+        let span = document.createElement("span");
+        if (msg[2] == 0) {
+          span.className = "message"
+          span.textContent = msg[0] + ":" 
+
+          let date_time = time_string(msg[3]);
+          let full_address = msg[1]
+          let cut_address = msg[1].substring(0,5) + ". " 
+
+          let datetime = document.createElement("span");
+          datetime.className = "extra_message_info"
+
+
+          datetime.textContent = cut_address + " at " + date_time
+          span.append(datetime);
+
+          span.addEventListener("pointerover", function() {
+            console.log("Enter");
+            datetime.textContent = full_address + " at " + date_time
+          })
+
+          span.addEventListener("pointerout", function() {
+            datetime.textContent = cut_address + " at " + date_time
+          })
+
+        } else {
+          span.className = "system_message"
+          span.textContent = msg[0] + ":" + time_string(msg[3])
+        }
+        
+        text_area.prepend(span)
+
+        children = text_area.children
+        if (children.length >= MAX_MESSAGES) {
+          children[MAX_MESSAGES - 1].remove()
+        }
+      }
+
+      function remake_restrictions() {
+         topler = document.getElementById("topler"); 
+         topler.innerHTML = "";
+       
+         for(let i = 0; i < restrictions.length; i++) {
+            let restriction = restrictions[i];
+            let alert = document.createElement("div");
+            alert.id = "alert_" + i
+            alert.className  = "alert"
+            
+            let alert_time_left = document.createElement("div");
+            alert_time_left.id = "alert_timer_" + i
+            alert_time_left.className  = "alert_time_left"
+            
+            let toptext = document.createElement("div");
+            toptext.className  = "toptext"
+            toptext.textContent = restriction[0] 
+           
+            let bottomtext = document.createElement("div");
+            bottomtext.className  = "bottomtext"
+            bottomtext.textContent = restriction[1] 
+            
+           
+            alert.append(alert_time_left);
+            alert.append(toptext);
+            alert.append(bottomtext);
+           
+            
+            topler.append(alert);
+         } 
+         cooldown_on_restrictions()
+      }
+      
+      function time_string(t) {
+        var now = new Date(t);
+        
+        var m = new Date(t);
+        var dateString
+        if(now.toDateString() == m.toDateString()) { // Date equals today's date
+        dateString =
+            ("0" + m.getUTCHours()).slice(-2) + ":" +
+            ("0" + m.getUTCMinutes()).slice(-2) + ":" +
+            ("0" + m.getUTCSeconds()).slice(-2);
+       }   else {
+        dateString =
+            m.getUTCFullYear() + "/" +
+            ("0" + (m.getUTCMonth()+1)).slice(-2) + "/" +
+            ("0" + m.getUTCDate()).slice(-2) + " " +
+            ("0" + m.getUTCHours()).slice(-2) + ":" +
+            ("0" + m.getUTCMinutes()).slice(-2) + ":" +
+            ("0" + m.getUTCSeconds()).slice(-2);
+
+       }
+
+       return dateString
+      
+      }
+  </script>
+  
+
+</body></html>

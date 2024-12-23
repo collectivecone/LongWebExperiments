@@ -1,0 +1,9 @@
+[package]
+name = "WebExperiments"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tungstenite = "0.24.0"
+fastrand = "2.2.0"
+serde_json = "1.0.133"
