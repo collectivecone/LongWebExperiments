@@ -95,9 +95,9 @@ fn website_handling(stream: TcpStream, request: Request) {
     let link = request.request.request.clone();
     
     if link.as_str() == "/style.css" {
-        reply_to_get(stream, "src/experiments/style.css");
+        reply_to_get(stream, "style.css");
     } else if link.as_str().trim() == "/favicon.png".trim() {
-        reply_to_get(stream, "src/experiments/favicon.png");
+        reply_to_get(stream, "favicon.png");
     } else if link == "/restrictions" {
         crate::experiments::restrictions::http_request(stream,request);
     } else if link == "/" || link ==  "/base" {

@@ -18,7 +18,7 @@ pub fn main() {
 
 pub fn http_request(stream: TcpStream, request: Request) {
     match request.request.http_type {
-        HttpTypes::Get => reply_to_get(stream,"src/experiments/base/website.html"),
+        HttpTypes::Get => reply_to_get(stream,"basewebsite.html"),
         _ => {}
     }
 }

@@ -56,7 +56,7 @@ fn write_msg_history() {
     let mut file = OpenOptions::new()
         .append(true)
         .create(true)
-        .open("src/experiments/restrictions/msghistory.txt")
+        .open("msghistory.txt")
         .unwrap();
 
     let mut message_list = String::new();
@@ -77,7 +77,7 @@ fn write_msg_history() {
 fn read_msg_history() {
     let  file_o = OpenOptions::new()
     .read(true)
-    .open("src/experiments/restrictions/msghistory.txt");
+    .open("msghistory.txt");
 
     if let Err(_) = file_o {
         return;
@@ -281,7 +281,7 @@ pub fn main() {
 
 pub fn http_request(stream: TcpStream, request: Request) {
     match request.request.http_type {
-        HttpTypes::Get => reply_to_get(stream,"src/experiments/restrictions/website.html"),
+        HttpTypes::Get => reply_to_get(stream,"restrictionswebsite.html"),
         _ => {}
     }
 }
