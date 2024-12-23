@@ -24,7 +24,7 @@ pub struct Request {
 }
 
 pub fn reply_to_get(mut stream: TcpStream,linker: &str) {
-    let status_line = "HTTP/1 200 OK";
+    let status_line = "HTTP/1.1 200 OK";
     println!("{}",linker);
     let mut contents = fs::read(linker).unwrap();
     let length = contents.len();
